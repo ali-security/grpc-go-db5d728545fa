@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"runtime"
 	"testing"
 	"time"
 
@@ -349,6 +350,9 @@ func (s) TestProvider_UpdateSuccess(t *testing.T) {
 // symlink is updates to point to new files. Verifies that the changes are
 // picked up by the provider.
 func (s) TestProvider_UpdateSuccessWithSymlink(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("symlink directory rename semantics differ on Windows")
+	}
 	baseName := "update_with_symlink"
 	for _, useSPIFFEBundle := range []bool{true, false} {
 		testName := baseName

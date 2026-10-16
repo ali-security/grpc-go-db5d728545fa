@@ -24,6 +24,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
 	"testing"
 	"time"
 
@@ -266,6 +267,9 @@ func (s) TestGracefulStopBlocksUntilGRPCConnectionsTerminate(t *testing.T) {
 // - Stop() returns
 // - and the RPC fails with an connection  closed error on the client-side
 func (s) TestStopAbortsBlockingGRPCCall(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows returns a wsarecv reset instead of the expected connection-closed error")
+	}
 	unblockGRPCCall := make(chan struct{})
 	grpcCallExecuting := make(chan struct{})
 	ss := &stubserver.StubServer{

@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -56,6 +57,9 @@ type Closable interface {
 }
 
 func (s) TestValidTlsBuilder(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	caCert := testdata.Path("x509/server_ca_cert.pem")
 	clientCert := testdata.Path("x509/client1_cert.pem")
 	clientKey := testdata.Path("x509/client1_key.pem")
@@ -122,6 +126,9 @@ func (s) TestValidTlsBuilder(t *testing.T) {
 }
 
 func (s) TestInvalidTlsBuilder(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	tests := []struct {
 		name, jd, wantErrPrefix string
 	}{
@@ -151,6 +158,9 @@ func (s) TestInvalidTlsBuilder(t *testing.T) {
 }
 
 func (s) TestCaReloading(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	serverCa, err := os.ReadFile(testdata.Path("x509/server_ca_cert.pem"))
 	if err != nil {
 		t.Fatalf("Failed to read test CA cert: %s", err)
@@ -238,6 +248,9 @@ func (s) TestCaReloading(t *testing.T) {
 // is performed and checked for failure, ensuring that gRPC is correctly using
 // the changed-on-disk bundle map.
 func (s) Test_SPIFFE_Reloading(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	testutils.SetEnvConfig(t, &envconfig.XDSSPIFFEEnabled, true)
 	clientSPIFFEBundle, err := os.ReadFile(testdata.Path("spiffe_end2end/client_spiffebundle.json"))
 	if err != nil {
@@ -326,6 +339,9 @@ func (s) Test_SPIFFE_Reloading(t *testing.T) {
 }
 
 func (s) TestMTLS(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	s := stubserver.StartTestService(t, nil, grpc.Creds(testutils.CreateServerTLSCredentials(t, tls.RequireAndVerifyClientCert)))
 	defer s.Stop()
 
@@ -359,6 +375,9 @@ func (s) TestMTLS(t *testing.T) {
 // chain that is compatible with the client's configured SPIFFE bundle map. An
 // MTLS connection is attempted between the two and checked for success.
 func (s) Test_MTLS_SPIFFE(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	testutils.SetEnvConfig(t, &envconfig.XDSSPIFFEEnabled, true)
 	tests := []struct {
 		name         string
@@ -411,6 +430,9 @@ func (s) Test_MTLS_SPIFFE(t *testing.T) {
 // bundle map. However, the XDS flag that enabled SPIFFE usage is disabled. An
 // MTLS connection is attempted between the two and checked for failure.
 func (s) Test_MTLS_SPIFFE_FlagDisabled(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	testutils.SetEnvConfig(t, &envconfig.XDSSPIFFEEnabled, false)
 	serverOption := grpc.Creds(testutils.CreateServerTLSCredentialsCompatibleWithSPIFFE(t, tls.RequireAndVerifyClientCert))
 	s := stubserver.StartTestService(t, nil, serverOption)
@@ -443,6 +465,9 @@ func (s) Test_MTLS_SPIFFE_FlagDisabled(t *testing.T) {
 }
 
 func (s) Test_MTLS_SPIFFE_Failure(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	testutils.SetEnvConfig(t, &envconfig.XDSSPIFFEEnabled, true)
 	tests := []struct {
 		name             string

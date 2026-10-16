@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -75,6 +76,9 @@ func (s) TestNewCallCredentialsWithInvalidConfig(t *testing.T) {
 }
 
 func (s) TestNewCallCredentialsWithValidConfig(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	token := createTestJWT(t)
 	tokenFile := writeTempFile(t, token)
 	config := `{"jwt_token_file": "` + tokenFile + `"}`
@@ -115,6 +119,9 @@ func (s) TestNewCallCredentialsWithValidConfig(t *testing.T) {
 }
 
 func (s) TestCallCredentials_Cleanup(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	token := createTestJWT(t)
 	tokenFile := writeTempFile(t, token)
 	config := `{"jwt_token_file": "` + tokenFile + `"}`

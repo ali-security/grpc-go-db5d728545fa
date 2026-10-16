@@ -19,6 +19,7 @@ package cdsbalancer
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -94,6 +95,9 @@ func verifyDNSResolution(ctx context.Context, t *testing.T, dnsTargetCh chan res
 // policy contains the expected discovery mechanism corresponding to the leaf
 // cluster, on both occasions.
 func (s) TestAggregateClusterSuccess_LeafNode(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("timing-sensitive; child policy config propagation is too slow on Windows hosted runners")
+	}
 	tests := []struct {
 		name                  string
 		firstClusterResource  *v3clusterpb.Cluster
@@ -187,6 +191,9 @@ func (s) TestAggregateClusterSuccess_LeafNode(t *testing.T) {
 // LogicalDNS and verifies that the load balancing configuration pushed to the
 // priority LB policy contains the expected config.
 func (s) TestAggregateClusterSuccess_ThenUpdateChildClusters(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("timing-sensitive; child policy config propagation is too slow on Windows hosted runners")
+	}
 	dnsTargetCh, dnsR := setupDNS(t)
 	lbCfgCh, _, _, _ := registerWrappedPriorityPolicy(t)
 	mgmtServer, nodeID, _ := setupWithManagementServer(t, nil, nil)

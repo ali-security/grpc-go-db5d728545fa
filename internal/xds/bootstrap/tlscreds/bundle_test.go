@@ -26,6 +26,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -61,6 +62,9 @@ func (f failingProvider) KeyMaterial(context.Context) (*certprovider.KeyMaterial
 func (f failingProvider) Close() {}
 
 func (s) TestFailingProvider(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows file paths are invalid JSON escapes in the bootstrap config literal")
+	}
 	s := stubserver.StartTestService(t, nil, grpc.Creds(testutils.CreateServerTLSCredentials(t, tls.RequireAndVerifyClientCert)))
 	defer s.Stop()
 
